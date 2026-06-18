@@ -1,0 +1,216 @@
+:root {
+  --primary-color: #0A68FF;
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --bot-msg-bg: #f0f2f5;
+  --user-msg-bg: #0A68FF;
+  --user-msg-text: #ffffff;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f7f6;
+}
+
+/* Chat Widget Container */
+#mt-chat-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 350px;
+  height: 500px;
+  background-color: var(--bg-color);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  z-index: 9999;
+  transform: translateY(120%);
+}
+
+#mt-chat-widget.open {
+  transform: translateY(0);
+}
+
+/* Chat Header */
+.mt-chat-header {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.mt-chat-close {
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+}
+
+/* Chat Body */
+.mt-chat-body {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Messages */
+.mt-msg {
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.mt-msg.bot, .mt-msg.agent {
+  align-self: flex-start;
+  background-color: var(--bot-msg-bg);
+  color: var(--text-color);
+  border-bottom-left-radius: 4px;
+}
+
+.mt-msg.user {
+  align-self: flex-end;
+  background-color: var(--user-msg-bg);
+  color: var(--user-msg-text);
+  border-bottom-right-radius: 4px;
+}
+
+/* Rich Media / Carousel */
+.mt-carousel {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding-bottom: 8px;
+  align-self: flex-start;
+  max-width: 100%;
+}
+
+.mt-carousel::-webkit-scrollbar {
+  height: 6px;
+}
+.mt-carousel::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
+.mt-product-card {
+  min-width: 200px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+}
+
+.mt-product-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.mt-product-info {
+  padding: 10px;
+}
+
+.mt-product-name {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.mt-product-price {
+  color: var(--primary-color);
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.mt-product-btn {
+  display: block;
+  width: 100%;
+  padding: 8px 0;
+  text-align: center;
+  background-color: var(--primary-color);
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+/* Chat Input */
+.mt-chat-input-container {
+  padding: 12px;
+  border-top: 1px solid #eee;
+  display: flex;
+  gap: 8px;
+}
+
+.mt-chat-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  outline: none;
+  font-size: 14px;
+}
+
+.mt-chat-input:focus {
+  border-color: var(--primary-color);
+}
+
+.mt-send-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Launcher Button */
+#mt-chat-launcher {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  background-color: var(--primary-color);
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(10, 104, 255, 0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9998;
+  transition: transform 0.2s;
+}
+
+#mt-chat-launcher:hover {
+  transform: scale(1.05);
+}
+
+#mt-chat-launcher svg {
+  fill: white;
+  width: 28px;
+  height: 28px;
+}
