@@ -16,8 +16,10 @@
       localStorage.setItem('mt_customer_id', customerId);
     }
 
-    // Connect to Backend
-    const socket = io(BACKEND_URL);
+    // Connect to Backend with max 5 retries to avoid infinite spam
+    const socket = io(BACKEND_URL, {
+      reconnectionAttempts: 5
+    });
 
     // Create UI
     const launcher = document.createElement('div');

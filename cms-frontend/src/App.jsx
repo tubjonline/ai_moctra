@@ -13,7 +13,9 @@ function App() {
   const [filter, setFilter] = useState('all'); // 'all' | 'needs_human'
 
   useEffect(() => {
-    const s = io(SOCKET_URL);
+    const s = io(SOCKET_URL, {
+      reconnectionAttempts: 5
+    });
     setSocket(s);
 
     s.on('connect', () => {
