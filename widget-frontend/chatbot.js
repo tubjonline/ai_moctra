@@ -6,7 +6,7 @@
   script.onload = initWidget;
   document.head.appendChild(script);
 
-  const BACKEND_URL = "http://localhost:3000"; // Update in production
+  const BACKEND_URL = "https://ai-moctra.onrender.com"; // Update in production
 
   function initWidget() {
     // Generate a simple customer ID (session based)
