@@ -48,12 +48,27 @@ body {
   font-size: 16px;
 }
 
-.mt-chat-close {
+.mt-header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.mt-chat-action-btn {
   cursor: pointer;
   background: none;
   border: none;
   color: white;
-  font-size: 20px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.mt-chat-action-btn svg {
+  fill: white;
+  width: 18px;
+  height: 18px;
 }
 
 /* Chat Body */
@@ -89,22 +104,81 @@ body {
   border-bottom-right-radius: 4px;
 }
 
-/* Rich Media / Carousel */
-.mt-carousel {
+/* Product List (Vertical) */
+.mt-product-list {
   display: flex;
-  overflow-x: auto;
+  flex-direction: column;
   gap: 12px;
-  padding-bottom: 8px;
-  align-self: flex-start;
-  max-width: 100%;
+  padding: 8px 12px 12px;
+}
+.mt-product-list-item {
+  width: 100%;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+}
+.mt-product-list-item img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+.mt-product-list-title {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 10px 4px;
+}
+.mt-product-list-price {
+  font-size: 14px;
+  color: #d32f2f;
+  font-weight: 600;
+  padding: 0 10px 10px;
+}
+.mt-add-to-cart-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 0 0 8px 8px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+.mt-add-to-cart-btn:hover {
+  background-color: #0850c8;
+}
+.mt-add-to-cart-btn.added {
+  background-color: #f44336;
+}
+.mt-add-to-cart-btn.added:hover {
+  background-color: #d32f2f;
 }
 
-.mt-carousel::-webkit-scrollbar {
-  height: 6px;
+/* Quick Replies */
+.mt-quick-replies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  margin-bottom: 12px;
+  margin-left: 12px;
 }
-.mt-carousel::-webkit-scrollbar-thumb {
-  background-color: #ccc;
-  border-radius: 4px;
+.mt-quick-reply-btn {
+  background-color: white;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 16px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.mt-quick-reply-btn:hover {
+  background-color: var(--primary-color);
+  color: white;
 }
 
 .mt-product-card {

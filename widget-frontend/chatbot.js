@@ -31,7 +31,12 @@
     widget.innerHTML = `
       <div class="mt-chat-header">
         Mộc Trà Silk CSKH
-        <button class="mt-chat-close">&times;</button>
+        <div class="mt-header-actions">
+          <button class="mt-chat-action-btn" id="mt-chat-reset" title="Bắt đầu phiên chat mới">
+            <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.95 7.95 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+          </button>
+          <button class="mt-chat-action-btn mt-chat-close" title="Đóng">&times;</button>
+        </div>
       </div>
       <div class="mt-chat-body" id="mt-chat-body">
         <div class="mt-msg bot">Dạ, Mộc Trà Silk xin chào! Mộc Trà có thể giúp gì cho quý khách ạ?</div>
@@ -51,6 +56,7 @@
     const input = document.getElementById('mt-chat-input');
     const sendBtn = document.getElementById('mt-send-btn');
     const closeBtn = document.querySelector('.mt-chat-close');
+    const resetBtn = document.getElementById('mt-chat-reset');
 
     // Toggle chat
     launcher.addEventListener('click', () => {
@@ -62,6 +68,23 @@
     closeBtn.addEventListener('click', () => {
       widget.classList.remove('open');
       setTimeout(() => launcher.style.display = 'flex', 300);
+    });
+
+    // Reset Chat Session
+    resetBtn.addEventListener('click', () => {
+      if(confirm('Bạn có chắc muốn bắt đầu phiên chat mới? Lịch sử cũ sẽ bị ẩn.')) {
+        // Create new ID
+        customerId = 'guest_' + Math.random().toString(36).substring(2, 9);
+        localStorage.setItem('mt_customer_id', customerId);
+        
+        // Clear UI
+        body.innerHTML = '<div class="mt-msg bot">Dạ, Mộc Trà Silk xin chào! Mộc Trà có thể giúp gì cho quý khách ạ?</div>';
+        
+        // Disconnect old socket and reconnect
+        socket.disconnect();
+        socket.connect();
+        socket.emit('join_chat', { customerId });
+      }
     });
 
     // Send message
@@ -83,8 +106,8 @@
     socket.on('new_message', (msg) => {
       if (msg.sender !== 'user') {
         appendMessage(msg.sender, msg.content);
-        if (msg.richMedia && msg.richMedia.type === 'carousel') {
-          appendCarousel(msg.richMedia.items);
+        if (msg.richMedia) {
+          appendRichMedia(msg.richMedia);
         }
       }
     });
@@ -93,8 +116,8 @@
       body.innerHTML = '';
       history.forEach(msg => {
         appendMessage(msg.sender, msg.content);
-        if (msg.richMedia && msg.richMedia.type === 'carousel') {
-          appendCarousel(msg.richMedia.items);
+        if (msg.richMedia) {
+          appendRichMedia(msg.richMedia);
         }
       });
       scrollToBottom();
@@ -110,25 +133,77 @@
       scrollToBottom();
     }
 
-    function appendCarousel(items) {
-      const container = document.createElement('div');
-      container.className = 'mt-carousel';
+    function appendRichMedia(media) {
+      if (media.type === 'carousel' && media.items && media.items.length > 0) {
+        let html = '<div class="mt-product-list">';
+        media.items.forEach(item => {
+          html += `
+            <div class="mt-product-list-item">
+              <img src="${item.image}" alt="${item.name}">
+              <div class="mt-product-list-title">${item.name}</div>
+              <div class="mt-product-list-price">${item.price.toLocaleString('vi-VN')}đ</div>
+              <button class="mt-add-to-cart-btn" data-name="${item.name}">Thêm vào giỏ hàng</button>
+            </div>
+          `;
+        });
+        html += '</div>';
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        body.appendChild(div);
+        
+        // Add event listeners to the new buttons
+        const newButtons = div.querySelectorAll('.mt-add-to-cart-btn');
+        newButtons.forEach(btn => {
+          btn.addEventListener('click', function() {
+            const prodName = this.getAttribute('data-name');
+            let text = "";
+            if (this.classList.contains('added')) {
+              // Remove from cart
+              this.classList.remove('added');
+              this.innerText = 'Thêm vào giỏ hàng';
+              text = "Tôi bỏ chọn mẫu: " + prodName;
+            } else {
+              // Add to cart
+              this.classList.add('added');
+              this.innerText = 'Bỏ khỏi giỏ';
+              text = "Tôi muốn mua mẫu: " + prodName;
+            }
+            appendMessage('user', text);
+            socket.emit('send_message', { customerId, text });
+          });
+        });
+      }
       
-      items.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'mt-product-card';
-        card.innerHTML = `
-          <img src="${item.image}" alt="${item.name}" class="mt-product-img" />
-          <div class="mt-product-info">
-            <div class="mt-product-name">${item.name}</div>
-            <div class="mt-product-price">${item.price.toLocaleString('vi-VN')} ₫</div>
-            <button class="mt-product-btn">Thêm vào giỏ</button>
-          </div>
-        `;
-        container.appendChild(card);
-      });
+      if (media.type === 'options' && media.items && media.items.length > 0) {
+        // Render Quick Replies
+        let html = '<div class="mt-quick-replies">';
+        media.items.forEach(opt => {
+          html += `<button class="mt-quick-reply-btn">${opt}</button>`;
+        });
+        html += '</div>';
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        body.appendChild(div);
 
-      body.appendChild(container);
+        // Add event listeners to quick replies
+        const newButtons = div.querySelectorAll('.mt-quick-reply-btn');
+        newButtons.forEach(btn => {
+          btn.addEventListener('click', function() {
+            const text = this.innerText;
+            // Remove the quick replies from UI after clicking
+            div.remove();
+            appendMessage('user', text);
+            socket.emit('send_message', { customerId, text });
+          });
+        });
+      }
+      
+      if (media.type === 'mixed') {
+        // Allow rendering both sequentially if mixed type is passed
+        if (media.products) appendRichMedia({type: 'carousel', items: media.products});
+        if (media.options) appendRichMedia({type: 'options', items: media.options});
+      }
+      
       scrollToBottom();
     }
 

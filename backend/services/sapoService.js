@@ -28,19 +28,32 @@ async function searchProducts(query) {
 
     const products = response.data.products || [];
     
-    // Map data sang format chuẩn cho Carousel
+    // Map data sang format chuẩn cho Carousel và trả về chi tiết tồn kho các size
     return products.map(p => {
       // Tìm hình đại diện
       const image = p.images && p.images.length > 0 ? p.images[0].src : 'https://via.placeholder.com/300x400?text=No+Image';
       
       // Lấy giá của phiên bản đầu tiên
       const price = p.variants && p.variants.length > 0 ? p.variants[0].price : 0;
+      
+      // Lấy danh sách các size còn tồn kho từ variants
+      const availableSizes = [];
+      if (p.variants) {
+        p.variants.forEach(v => {
+          if (v.inventory_quantity > 0) {
+            // Sapo thường lưu size ở title (ví dụ "Đỏ / M") hoặc trong mảng options
+            // Giả định đơn giản: lấy title của variant (ví dụ: "Size S", "M", "L")
+            availableSizes.push(v.title || v.name || 'Mặc định');
+          }
+        });
+      }
 
       return {
         id: p.id,
         name: p.name,
         price: price,
         inStock: p.variants ? p.variants.some(v => v.inventory_quantity > 0) : true,
+        availableSizes: availableSizes,
         image: image
       };
     });
