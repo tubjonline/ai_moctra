@@ -132,8 +132,7 @@ async function chat(userMessage, conversationId) {
       }
       
       if (call.name === 'welcome_screen') {
-        const botText = "Xin chào Anh/Chị, Mộc Trà rất hân hạnh được phục vụ.\nHiện tại Mộc Trà cung cấp nhiều dòng áo dài như:\n• Áo dài nữ\n• Áo dài nam\n• Áo dài trẻ em\n\nAnh/Chị có thể tham khảo các mẫu mới tại: moctrasilk.com. Dưới đây là một số mẫu áo dài được khách hàng lựa chọn nhiều nhất hiện nay. Mộc Trà sẵn sàng tư vấn để Anh/Chị lựa chọn được thiết kế phù hợp nhất.";
-        const products = await sapoService.searchProducts("áo dài");
+        const botText = "Xin chào Anh/Chị, Mộc Trà rất hân hạnh được phục vụ.\nHiện tại Mộc Trà cung cấp nhiều dòng áo dài như:\n• Áo dài nữ\n• Áo dài nam\n• Áo dài trẻ em\n\nAnh/Chị có thể tham khảo các mẫu mới tại: moctrasilk.com. Mộc Trà sẵn sàng tư vấn để Anh/Chị lựa chọn được thiết kế phù hợp nhất.";
         const options = ["Áo dài nữ", "Áo dài nam", "Áo dài trẻ em"];
         
         chatHistory.push({ role: 'user', text: userMessage });
@@ -142,7 +141,7 @@ async function chat(userMessage, conversationId) {
         return { 
           handoff: false, 
           text: botText, 
-          richMedia: { type: 'mixed', products: products, options: options } 
+          richMedia: { type: 'options', items: options } 
         };
       }
 
