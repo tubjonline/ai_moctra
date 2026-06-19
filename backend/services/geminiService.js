@@ -123,11 +123,11 @@ async function chat(userMessage, conversationId) {
 
       if (call.name === 'create_draft_order') {
         // Gửi tín hiệu tạo đơn nháp (sẽ xử lý ở server.js)
-        const orderSummary = \`ĐƠN NHÁP: Khách \${call.args.customerName} (\${call.args.phone}) đặt \${call.args.productName} size \${call.args.size}.\`;
+        const orderSummary = `ĐƠN NHÁP: Khách ${call.args.customerName} (${call.args.phone}) đặt ${call.args.productName} size ${call.args.size}.`;
         return { 
           draftOrder: true, 
           orderData: call.args,
-          text: \`Dạ, Mộc Trà đã lên đơn nháp thành công cho anh/chị. Để hoàn tất, anh/chị vui lòng chuyển khoản theo thông tin sau:\n\nNgân hàng: MB Bank\nSTK: 869783333\nChủ TK: CTY TNHH TM DV VA BAN LE MOC TRA\nChi nhánh: PGD Thanh Oai\n\nSau khi chuyển khoản, Anh/Chị vui lòng gửi giúp Mộc Trà ảnh màn hình giao dịch nhé.\`
+          text: `Dạ, Mộc Trà đã lên đơn nháp thành công cho anh/chị. Cảm ơn anh chị đã lựa chọn Mộc Trà Silk.`
         };
       }
       
@@ -161,7 +161,7 @@ async function chat(userMessage, conversationId) {
         
         let textResponse = "";
         if (products.length > 0) {
-          textResponse = \`Dạ, Mộc Trà gửi Anh/Chị thông tin một số sản phẩm phù hợp. Các mẫu này hiện đang còn size: \${products.map(p => p.availableSizes.join(', ')).join(' | ')}. Anh/Chị có thể tham khảo nhé.\`;
+          textResponse = `Dạ, Mộc Trà gửi Anh/Chị thông tin một số sản phẩm phù hợp. Các mẫu này hiện đang còn size: ${products.map(p => p.availableSizes.join(', ')).join(' | ')}. Anh/Chị có thể tham khảo nhé.`;
         } else {
           textResponse = "Dạ, hiện tại Mộc Trà không tìm thấy sản phẩm nào khớp với yêu cầu của quý khách.";
         }
