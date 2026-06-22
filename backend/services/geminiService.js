@@ -7,31 +7,44 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 // Conversation history in memory
 const historyMap = new Map();
 
-const systemInstruction = `Bạn là nhân viên CSKH xuất sắc của Mộc Trà Silk - Thương hiệu áo dài thiết kế cao cấp.
+const systemInstruction = `Ban la nhan vien CSKH xuat sac cua Moc Tra Silk - Thuong hieu ao dai thiet ke cao cap.
 Website: moctrasilk.com
-Cửa hàng may đo: Tòa nhà C2, Số 14 Thụy Khuê, Phường Tây Hồ, Thành phố Hà Nội, Việt Nam.
-Nhiệm vụ của bạn là tư vấn tận tình, lịch sự, chuyên nghiệp và chốt sale hiệu quả. Xưng hô "Mộc Trà" và "Anh/Chị".
-Nếu khách có thái độ tiêu cực, dùng từ ngữ tục tĩu -> Gọi hàm 'trigger_handoff'.
+Cua hang may do: Toa nha C2, So 14 Thuy Khue, Phuong Tay Ho, Thanh pho Ha Noi, Viet Nam.
+Nhiem vu cua ban la tu van tan tinh, lich su, chuyen nghiep va chot sale hieu qua. Xung ho "Moc Tra" va "Anh/Chi".
+Neu khach co thai do tieu cuc, dung tu ngu tuc tiu -> Goi ham 'trigger_handoff'.
 
-THÔNG TIN QUAN TRỌNG ĐỂ TƯ VẤN:
-1. BẢNG SIZE ÁO DÀI NGƯỜI LỚN
-Size XS: Chiều cao 148-155cm, Nặng 38-44kg, Ngực 76-80cm, Eo 58-62cm, Hông 82-86cm.
-Size S: Chiều cao 150-158cm, Nặng 40-47kg, Ngực 80-84cm, Eo 62-66cm, Hông 86-90cm.
-Size M: Chiều cao 155-162cm, Nặng 47-53kg, Ngực 84-88cm, Eo 66-70cm, Hông 90-94cm.
-Size L: Chiều cao 158-165cm, Nặng 53-60kg, Ngực 88-92cm, Eo 70-74cm, Hông 94-98cm.
-Size XL: Chiều cao 160-168cm, Nặng 60-68kg, Ngực 92-96cm, Eo 74-78cm, Hông 98-102cm.
+THONG TIN QUAN TRONG DE TU VAN:
+1. BANG SIZE AO DAI NGUOI LON
+Size XS: Chieu cao 148-155cm, Nang 38-44kg, Nguc 76-80cm, Eo 58-62cm, Hong 82-86cm.
+Size S: Chieu cao 150-158cm, Nang 40-47kg, Nguc 80-84cm, Eo 62-66cm, Hong 86-90cm.
+Size M: Chieu cao 155-162cm, Nang 47-53kg, Nguc 84-88cm, Eo 66-70cm, Hong 90-94cm.
+Size L: Chieu cao 158-165cm, Nang 53-60kg, Nguc 88-92cm, Eo 70-74cm, Hong 94-98cm.
+Size XL: Chieu cao 160-168cm, Nang 60-68kg, Nguc 92-96cm, Eo 74-78cm, Hong 98-102cm.
 
-KỊCH BẢN TƯ VẤN 5 BƯỚC (BẠN PHẢI TUÂN THỦ NGHIÊM NGẶT):
+2. BANG SIZE TRE EM
+Size 2: 2-3 tuoi, Cao 92-98cm, Nang 10-14kg.
+Size 4: 3-4 tuoi, Cao 100-110cm, Nang 15-20kg.
+Size 6: 5-6 tuoi, Cao 110-120cm, Nang 20-24kg.
+Size 8: 7-8 tuoi, Cao 120-130cm, Nang 26-30kg.
+Size 10: 9-10 tuoi, Cao 130-140cm, Nang 34-38kg.
+Size 12: 11-12 tuoi, Cao 140-150cm, Nang 40-45kg.
 
-Bước 1: Chào hỏi. Nếu khách mới vào (chào hỏi chung chung), BẠN PHẢI GỌI HÀM 'welcome_screen'. Hàm này sẽ tự động hiển thị lời chào chuẩn, các mẫu áo dài nổi bật và nút chọn đối tượng. Không cần tự trả lời bằng văn bản ở bước này.
-Bước 2: Hiển thị sản phẩm. Khi khách chọn đối tượng (ví dụ "Áo dài nữ"), BẠN PHẢI gọi hàm 'search_products' với từ khóa tương ứng để hiển thị ảnh. Nếu kho hết hàng, thông báo hết hàng và nhờ khách chọn mẫu khác.
-Bước 3: Lấy số đo. Khi khách chọn "Thêm vào giỏ hàng" (tức là muốn mua mẫu đó), hỏi khách hàng về chiều cao, cân nặng, số đo 3 vòng (Ngực-Eo-Mông) để tư vấn size.
-Bước 4: Tư vấn Size. Tra cứu xem số đo có phù hợp với bảng size không. 
-   - Nếu KHÔNG có size phù hợp, trả lời Y HỆT câu sau: "Với số đo hiện tại, sản phẩm có thể không vừa hoàn toàn theo size tiêu chuẩn. Để đảm bảo form áo đẹp nhất, Mộc Trà khuyến khích Anh/Chị đến cửa hàng để may đo theo số đo riêng tại: Tòa nhà C2, Số 14 Thụy Khuê, Phường Tây Hồ, Thành phố Hà Nội, Việt Nam."
-   - Nếu CÓ size phù hợp, kiểm tra xem size đó CÒN HÀNG không. Nếu hết hàng, hiển thị lại danh sách sản phẩm và nhờ khách chọn mẫu khác. Nếu khách không chịu chọn -> gọi 'trigger_handoff'.
-Bước 5: Chốt đơn. Hỏi thông tin: Họ và tên, số điện thoại, địa chỉ nhận hàng. Sau đó gọi hàm 'create_draft_order' để lên đơn nháp và tự động chuyển thông tin cho nhân viên CSKH (CMS). Không cần yêu cầu chuyển khoản MB Bank.
+KICH BAN TU VAN 4 BUOC (BAN PHAI TUAN THU NGHIEM NGAT THEO THU TU):
 
-LƯU Ý ĐẶC BIỆT: Khi khách nhấn "Bỏ khỏi giỏ" (tin nhắn "Tôi bỏ chọn mẫu..."), bạn xác nhận đã hủy chọn và mời họ xem mẫu khác.
+BUOC 1 - CHAO HOI: Khi khach moi vao (chao hoi chung chung hoac bat dau cuoc tro chuyen), BAN PHAI GOI HAM 'welcome_screen'. KHONG tu tra loi bang van ban. Ham nay se tu dong hien thi loi chao va 3 nut chon doi tuong.
+
+BUOC 2 - HIEN THI SAN PHAM: Khi khach chon doi tuong (vi du "Ao dai nu", "Ao dai nam", "Ao dai tre em"), BAN PHAI GOI HAM 'search_products' voi tu khoa tuong ung. San pham se hien thi kem nut "Dat hang". Khach nhan nut "Dat hang" se gui tin nhan "Toi muon mua mau: [ten san pham]". Khi nhan duoc tin nhan nay, chuyen sang BUOC 3.
+
+BUOC 3 - LAY SO DO VA TU VAN SIZE: Hoi khach ve chieu cao, can nang, so do 3 vong (Nguc-Eo-Mong) de tu van size.
+   3.1 Neu CO size phu hop: Chuyen sang BUOC 4.
+   3.2 Neu KHONG co size phu hop: Goi ham 'add_to_waitlist' de gui vao danh sach cho CMS. Tra loi Y HET cau sau: "Voi so do hien tai, san pham co the khong vua hoan toan theo size tieu chuan. De dam bao form ao dep nhat, Moc Tra khuyen khich Anh/Chi den cua hang de may do theo so do rieng tai: Toa nha C2, So 14 Thuy Khue, Phuong Tay Ho, Thanh pho Ha Noi, Viet Nam."
+
+BUOC 4 - CHOT DON: Hoi thong tin: Ho va ten, so dien thoai, dia chi nhan hang. Sau do goi ham 'create_draft_order'. Sau khi len don xong, hoi khach co muon dat them san pham nao khong va goi ham 'show_options' voi cac lua chon ["Dat them ao dai nu", "Dat them ao dai nam", "Dat them ao dai tre em"]. Neu khach chon dat them thi quay lai BUOC 2.
+
+LUU Y DAC BIET: 
+- Khi khach nhan "Bo khoi gio" (tin nhan "Toi bo chon mau..."), ban xac nhan da huy chon va moi ho xem mau khac.
+- KHONG BAO GIO tu y nhay buoc. Phai lam tuan tu 1 -> 2 -> 3 -> 4.
+- Khi khach noi "Xem them" thi goi lai ham search_products voi cung tu khoa.
 `;
 
 async function chat(userMessage, conversationId) {
@@ -57,12 +70,12 @@ async function chat(userMessage, conversationId) {
           functionDeclarations: [
             {
               name: "welcome_screen",
-              description: "Hiển thị màn hình chào mừng bao gồm lời chào chuẩn, 3 sản phẩm nổi bật và 3 nút phân loại. Gọi hàm này khi khách hàng mới bắt đầu chat.",
+              description: "Hien thi man hinh chao mung voi loi chao chuan va 3 nut phan loai ao dai. Goi ham nay khi khach moi bat dau chat hoac chao hoi.",
               parameters: { type: "OBJECT", properties: {} }
             },
             {
               name: "search_products",
-              description: "Tìm kiếm sản phẩm (vd: áo dài nữ, khăn lụa) để hiển thị hình ảnh và thẻ sản phẩm cho khách.",
+              description: "Tim kiem san pham (vd: ao dai nu, ao dai nam, ao dai tre em) de hien thi hinh anh va the san pham cho khach.",
               parameters: {
                 type: "OBJECT",
                 properties: { query: { type: "STRING" } },
@@ -71,14 +84,14 @@ async function chat(userMessage, conversationId) {
             },
             {
               name: "show_options",
-              description: "Hiển thị các nút bấm lựa chọn (Quick Replies) cho khách hàng trên màn hình chat.",
+              description: "Hien thi cac nut bam lua chon (Quick Replies) cho khach hang tren man hinh chat.",
               parameters: {
                 type: "OBJECT",
                 properties: {
                   options: {
                     type: "ARRAY",
                     items: { type: "STRING" },
-                    description: "Mảng chứa các lựa chọn dạng text (Ví dụ: ['Áo dài nam', 'Áo dài nữ'])"
+                    description: "Mang chua cac lua chon dang text"
                   }
                 },
                 required: ["options"]
@@ -86,7 +99,7 @@ async function chat(userMessage, conversationId) {
             },
             {
               name: "trigger_handoff",
-              description: "Chuyển cho nhân viên CSKH khi khách yêu cầu gặp người thật hoặc phàn nàn.",
+              description: "Chuyen cho nhan vien CSKH khi khach yeu cau gap nguoi that hoac phan nan.",
               parameters: {
                 type: "OBJECT",
                 properties: { reason: { type: "STRING" } },
@@ -95,18 +108,30 @@ async function chat(userMessage, conversationId) {
             },
             {
               name: "create_draft_order",
-              description: "Tạo đơn hàng nháp gửi cho nhân viên CSKH sau khi khách chốt mua hàng.",
+              description: "Tao don hang nhap gui cho nhan vien CSKH sau khi khach chot mua hang.",
               parameters: {
                 type: "OBJECT",
                 properties: {
-                  customerName: { type: "STRING", description: "Tên khách hàng" },
-                  phone: { type: "STRING", description: "Số điện thoại" },
-                  address: { type: "STRING", description: "Địa chỉ nhận hàng" },
-                  productName: { type: "STRING", description: "Tên sản phẩm" },
-                  size: { type: "STRING", description: "Size khách đặt" },
-                  totalPrice: { type: "NUMBER", description: "Tổng tiền" }
+                  customerName: { type: "STRING", description: "Ten khach hang" },
+                  phone: { type: "STRING", description: "So dien thoai" },
+                  address: { type: "STRING", description: "Dia chi nhan hang" },
+                  productName: { type: "STRING", description: "Ten san pham" },
+                  size: { type: "STRING", description: "Size khach dat" },
+                  totalPrice: { type: "NUMBER", description: "Tong tien" }
                 },
                 required: ["customerName", "phone", "productName", "size"]
+              }
+            },
+            {
+              name: "add_to_waitlist",
+              description: "Gui thong tin khach hang vao danh sach cho (CMS) khi khong co size phu hop.",
+              parameters: {
+                type: "OBJECT",
+                properties: {
+                  customerMessage: { type: "STRING", description: "Thong tin khach hang va san pham muon mua" },
+                  measurements: { type: "STRING", description: "So do cua khach hang" }
+                },
+                required: ["customerMessage"]
               }
             }
           ]
@@ -122,18 +147,36 @@ async function chat(userMessage, conversationId) {
       }
 
       if (call.name === 'create_draft_order') {
-        // Gửi tín hiệu tạo đơn nháp (sẽ xử lý ở server.js)
-        const orderSummary = `ĐƠN NHÁP: Khách ${call.args.customerName} (${call.args.phone}) đặt ${call.args.productName} size ${call.args.size}.`;
+        const orderSummary = "DON NHAP: Khach " + call.args.customerName + " (" + call.args.phone + ") dat " + call.args.productName + " size " + call.args.size + ".";
+        const botText = "Da, Moc Tra da len don nhap thanh cong cho Anh/Chi. Cam on Anh/Chi da lua chon Moc Tra Silk. Anh/Chi co muon dat them san pham nao khong a?";
+        
+        chatHistory.push({ role: 'user', text: userMessage });
+        chatHistory.push({ role: 'model', text: botText });
+        
         return { 
           draftOrder: true, 
           orderData: call.args,
-          text: `Dạ, Mộc Trà đã lên đơn nháp thành công cho anh/chị. Cảm ơn anh chị đã lựa chọn Mộc Trà Silk.`
+          text: botText,
+          richMedia: { type: 'options', items: ["Dat them ao dai nu", "Dat them ao dai nam", "Dat them ao dai tre em"] }
+        };
+      }
+
+      if (call.name === 'add_to_waitlist') {
+        const botText = "Voi so do hien tai, san pham co the khong vua hoan toan theo size tieu chuan.\n\nDe dam bao form ao dep nhat, Moc Tra khuyen khich Anh/Chi den cua hang de may do theo so do rieng tai:\n\nToa nha C2, So 14 Thuy Khue, Phuong Tay Ho, Thanh pho Ha Noi, Viet Nam.\n\nMoc Tra da ghi nhan thong tin cua Anh/Chi. Nhan vien se lien he lai trong thoi gian som nhat a.";
+        
+        chatHistory.push({ role: 'user', text: userMessage });
+        chatHistory.push({ role: 'model', text: botText });
+        
+        return { 
+          waitlist: true, 
+          waitlistData: call.args,
+          text: botText 
         };
       }
       
       if (call.name === 'welcome_screen') {
-        const botText = "Xin chào Anh/Chị, Mộc Trà rất hân hạnh được phục vụ.\nHiện tại Mộc Trà cung cấp nhiều dòng áo dài như:\n• Áo dài nữ\n• Áo dài nam\n• Áo dài trẻ em\n\nAnh/Chị có thể tham khảo các mẫu mới tại: moctrasilk.com. Mộc Trà sẵn sàng tư vấn để Anh/Chị lựa chọn được thiết kế phù hợp nhất.";
-        const options = ["Áo dài nữ", "Áo dài nam", "Áo dài trẻ em"];
+        const botText = "Xin chao Anh/Chi, Moc Tra rat han hanh duoc phuc vu.\nHien tai Moc Tra cung cap nhieu dong ao dai nhu:\n\u2022 Ao dai nu\n\u2022 Ao dai nam\n\u2022 Ao dai tre em\n\nAnh/Chi co the tham khao cac mau moi tai: moctrasilk.com.\nMoc Tra san sang tu van de Anh/Chi lua chon duoc thiet ke phu hop nhat.\n\nAnh/Chi dang co nhu cau tim mau cho doi tuong nao a?";
+        const options = ["Ao dai nu", "Ao dai nam", "Ao dai tre em"];
         
         chatHistory.push({ role: 'user', text: userMessage });
         chatHistory.push({ role: 'model', text: botText });
@@ -147,7 +190,7 @@ async function chat(userMessage, conversationId) {
 
       if (call.name === 'show_options') {
         const options = call.args.options || [];
-        const botText = response.text || "Dạ, Anh/Chị vui lòng chọn một trong các tùy chọn sau ạ:";
+        const botText = response.text || "Da, Anh/Chi vui long chon mot trong cac tuy chon sau a:";
         
         chatHistory.push({ role: 'user', text: userMessage });
         chatHistory.push({ role: 'model', text: botText });
@@ -160,9 +203,14 @@ async function chat(userMessage, conversationId) {
         
         let textResponse = "";
         if (products.length > 0) {
-          textResponse = `Dạ, Mộc Trà gửi Anh/Chị thông tin một số sản phẩm phù hợp. Các mẫu này hiện đang còn size: ${products.map(p => p.availableSizes.join(', ')).join(' | ')}. Anh/Chị có thể tham khảo nhé.`;
+          const inStockProducts = products.filter(p => p.inStock);
+          const outOfStockProducts = products.filter(p => !p.inStock);
+          textResponse = "Da, Moc Tra gui Anh/Chi mot so mau phu hop. Anh/Chi co the tham khao va nhan nut 'Dat hang' de chon mau ua thich nhe.";
+          if (outOfStockProducts.length > 0) {
+            textResponse += " (Luu y: Mot so mau hien dang het hang.)";
+          }
         } else {
-          textResponse = "Dạ, hiện tại Mộc Trà không tìm thấy sản phẩm nào khớp với yêu cầu của quý khách.";
+          textResponse = "Da, hien tai Moc Tra khong tim thay san pham nao khop voi yeu cau cua quy khach.";
         }
         
         chatHistory.push({ role: 'user', text: userMessage });
@@ -172,7 +220,7 @@ async function chat(userMessage, conversationId) {
       }
     }
 
-    const botText = response.text || "Dạ, Mộc Trà đang xử lý yêu cầu của quý khách.";
+    const botText = response.text || "Da, Moc Tra dang xu ly yeu cau cua quy khach.";
     chatHistory.push({ role: 'user', text: userMessage });
     chatHistory.push({ role: 'model', text: botText });
     
@@ -181,7 +229,7 @@ async function chat(userMessage, conversationId) {
     return { handoff: false, text: botText };
   } catch (error) {
     console.error("Gemini API Error:", error);
-    return { handoff: false, text: "Dạ, hệ thống đang gặp chút sự cố, quý khách vui lòng thử lại sau giây lát ạ." };
+    return { handoff: false, text: "Da, he thong dang gap chut su co, quy khach vui long thu lai sau giay lat a." };
   }
 }
 

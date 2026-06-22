@@ -136,25 +136,41 @@ body {
   font-weight: 600;
   padding: 0 10px 10px;
 }
-.mt-add-to-cart-btn {
+/* Order Button */
+.mt-order-btn {
   background-color: var(--primary-color);
   color: white;
   border: none;
-  padding: 8px;
-  font-size: 12px;
+  padding: 10px;
+  font-size: 13px;
   cursor: pointer;
   border-radius: 0 0 8px 8px;
   font-weight: bold;
   transition: background-color 0.2s;
 }
-.mt-add-to-cart-btn:hover {
+.mt-order-btn:hover {
   background-color: #0850c8;
 }
-.mt-add-to-cart-btn.added {
+.mt-order-btn.selected {
   background-color: #f44336;
 }
-.mt-add-to-cart-btn.added:hover {
+.mt-order-btn.selected:hover {
   background-color: #d32f2f;
+}
+.mt-order-btn.disabled {
+  background-color: #ccc;
+  color: #888;
+  cursor: not-allowed;
+}
+.mt-out-of-stock {
+  background-color: rgba(0,0,0,0.6);
+  color: white;
+  text-align: center;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-top: -28px;
+  position: relative;
 }
 
 /* Quick Replies */
@@ -171,7 +187,7 @@ body {
   color: var(--primary-color);
   border: 1px solid var(--primary-color);
   border-radius: 16px;
-  padding: 6px 12px;
+  padding: 8px 14px;
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s;
@@ -179,6 +195,11 @@ body {
 .mt-quick-reply-btn:hover {
   background-color: var(--primary-color);
   color: white;
+}
+.mt-see-more-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: 1px solid var(--primary-color);
 }
 
 .mt-product-card {

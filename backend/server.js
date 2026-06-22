@@ -82,28 +82,44 @@ async function startServer() {
             io.to(conv._id.toString()).emit('new_message', handoffMsg);
             io.to('cms').emit('new_message', { conversation: conv, message: handoffMsg });
           } else if (botResponse.draftOrder) {
-            // Đánh dấu cần nhân viên vào xác nhận đơn nháp & thanh toán
-            conv.status = 'needs_human';
-            await conv.save();
-            io.to('cms').emit('conversation_updated', conv);
-
-            // Gửi tin nhắn bot báo số tài khoản cho khách
+            // Gui tin nhan bot cho khach (kem options "Dat them")
             const draftMsg = await Message.create({
               conversationId: conv._id,
               sender: 'bot',
-              content: botResponse.text
+              content: botResponse.text,
+              richMedia: botResponse.richMedia
             });
             io.to(conv._id.toString()).emit('new_message', draftMsg);
             io.to('cms').emit('new_message', { conversation: conv, message: draftMsg });
 
-            // (Tùy chọn) Có thể tạo thêm 1 message ẩn báo cho riêng CMS biết đây là đơn nháp
+            // Bao CMS co don moi
             const alertMsg = await Message.create({
               conversationId: conv._id,
               sender: 'bot',
-              content: `🔔 HỆ THỐNG: Bot đã chốt đơn nháp cho khách: ${botResponse.orderData.productName} size ${botResponse.orderData.size}. Vui lòng kiểm tra thanh toán!`
+              content: "HE THONG: Bot da chot don nhap cho khach: " + botResponse.orderData.productName + " size " + botResponse.orderData.size + ". Vui long kiem tra!"
             });
             io.to('cms').emit('new_message', { conversation: conv, message: alertMsg });
+            io.to('cms').emit('conversation_updated', conv);
             
+          } else if (botResponse.waitlist) {
+            // Gui vao danh sach cho CMS
+            conv.status = 'needs_human';
+            await conv.save();
+            io.to('cms').emit('conversation_updated', conv);
+            
+            const waitlistMsg = await Message.create({
+              conversationId: conv._id,
+              sender: 'bot',
+              content: botResponse.text
+            });
+            io.to(conv._id.toString()).emit('new_message', waitlistMsg);
+
+            const alertMsg = await Message.create({
+              conversationId: conv._id,
+              sender: 'bot',
+              content: "HE THONG: Khach can may do rieng. " + (botResponse.waitlistData ? botResponse.waitlistData.customerMessage : '') + ". Vui long lien he tu van!"
+            });
+            io.to('cms').emit('new_message', { conversation: conv, message: alertMsg });
           } else {
             const botMsg = await Message.create({
               conversationId: conv._id,
